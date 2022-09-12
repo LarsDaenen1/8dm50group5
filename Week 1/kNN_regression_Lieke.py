@@ -45,12 +45,10 @@ def kNN_regression(k, X_train, y_train, X_test, y_test):
         
     return y_pred
 
-def evaluation_kNN(y_test, y_pred):
+def MSE_kNN(y_test, y_pred):
+
+    MSE = (1/len(y_pred))*np.sum((y_pred-y_test)**2)
     
-    diff = abs(y_test-y_pred)
-    N = y_test.shape[0]
-    
-    mean_diff = diff.sum()/N
-    return mean_diff
+    return MSE
     
     
