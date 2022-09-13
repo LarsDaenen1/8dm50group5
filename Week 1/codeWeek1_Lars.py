@@ -1,6 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def lsq(X, y):
+    """
+    Least squares linear regression
+    :param X: Input data matrix
+    :param y: Target vector
+    :return: Estimated coefficient vector for the linear regression
+    """
+
+    # add column of ones for the intercept
+    ones = np.ones((len(X), 1))
+    X = np.concatenate((ones, X), axis=1)
+
+    # calculate the coefficients
+    beta = np.dot(np.linalg.inv(np.dot(X.T, X)), np.dot(X.T, y))
+
+    return beta
+
+
 def pred(x, w):
     """
     Predicts the output y based on the input x and fitted weights w 
@@ -26,7 +44,8 @@ def calcMSE(y, y_pred):
     
     return MSE 
 
-def kNNclassifier(X_train, X_test, y_train, k):
+def kNN(X_train, y_train, X_test, y_test, k, regression=False):
+    
     """
     Implementation of k-Nearest neighbours classifiers
     :param X_train: Input training data
@@ -34,53 +53,43 @@ def kNNclassifier(X_train, X_test, y_train, k):
     :param X_test: Input test data
     :k: # of neighbours used for classification
     :return: predicted class
+    or if the regression argument is set to 'True' the function will return the average value of the 
+    k closest neighbours as prediction for the new data point
     """
-    classes = []
-    # Loop over all samples in the test set
-    for i in range(len(X_test)):
-        distances = []
-        # Loop over all samples in the training set
-        for j in range(len(X_train)):
-            # Calculate the Euclidian distance between test set sample and training set sample
-            distance = np.linalg.norm(X_train[j]-X_test[i])
-            distances.append([distance, y_train[j]])
-        # Sort based on distances
-        distances_sorted = sorted(distances, key=lambda x: x[0])
-        # Calculate the median predicted class based on first k neighbours
-        classes.append(round(np.median(list(distances_sorted[i][1] for i in range(k)))))
-        
-    return classes
+    
+    nsamples = X_train.shape[0]
+    features = X_train.shape[1]
 
-def kNNRegression(X_train, X_test, y_train, k):
-    """
-    Implementation of k-Nearest neighbours regression
-    :param X_train: Input training data
-    :param y_train: Output training data
-    :param X_test: Input test data
-    :param k: # of neighbours used for classification
-    :return: predicted value
-    """
-    y_pred = []
-    # Loop over all samples in the test set
-    for i in range(len(X_test)):
-        distances = []
-        # Loop over all samples in the training set
-        for j in range(len(X_train)):
-            # Calculate the Euclidian distance between test set sample and training set sample
-            distance = np.linalg.norm(X_train[j]-X_test[i])
-            distances.append([distance, y_train[j]])
-        # Sort based on distances
-        distances_sorted = np.array(sorted(distances, key=lambda x: x[0]))
-        # Calculate the mean predicted value based on first k neighbours
-        y_pred.append(np.mean(distances_sorted[:k, 1]))
-        
-    return y_pred
+    # Broadcasting to find pairwise differences
+
+    diff = X_train.reshape(nsamples,1,features)-X_test
+    
+    # Compute euclidian distance
+    euc_dist = np.sqrt((diff**2).sum(2))
+    euc_dist = euc_dist.T
+    
+    # Find indices of shortest euclidian distances to neighbours for all points by sorting the numpy array
+    ind = np.argsort(euc_dist)
+
+    # We select only the indices of the k closest points
+    k_indices = ind[:,0:k]
+    
+    # We use those indices to find the corresponding target labels in the y_train
+    k_targets = y_train[k_indices]
+    
+    if regression == False:
+        median = np.round(np.median(k_targets, axis=1))
+        return median
+
+    else:
+        mean = np.mean(k_targets, axis=1)
+        return mean
 
 
 def class_conditional_prob(X,Y):
     
     # Calculate probability of y=1
-    Py = np.sum(Y[:,0])/Y.shape[0]
+    Py = np.sum(Y[:,0] == 1)/Y.shape[0]
 
     # Loop over all features of X
     for i in range(X.shape[1]):
@@ -95,12 +104,12 @@ def class_conditional_prob(X,Y):
         P = []
         
         # Calculate P(x=X|y=Y) 
-        for x in np.linspace(0,1,100):
+        for x in np.unique(XY):
             Pxy = np.sqrt(1/(2*np.pi*var))*np.exp(-1/(2*var)*(x-mu)**2)
             Pcond = Pxy / Py
             P.append(Pcond)
 
         # Visualize the results
-        plt.plot(list(np.linspace(0,1,100)), P, 'b-')
+        plt.plot(list(np.unique(XY)), P, 'b-')
         plt.title('Class conditional probability feature {:.0f}'.format(i+1))
         plt.show()
