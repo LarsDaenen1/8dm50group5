@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+
 
 def lsq(X, y):
     """
@@ -56,7 +59,7 @@ def kNN(X_train, y_train, X_test, y_test, k, regression=False):
     euc_dist = np.sqrt((diff**2).sum(2))
     euc_dist = euc_dist.T
     
-    # Find indices of shortest euclidian distances to neighbours for all points by sorting the numpy array
+    # Find indices of shortest euclidian distances for all test samples to their neighbours by sorting the numpy array
     ind = np.argsort(euc_dist)
 
     # We select only the indices of the k closest points
@@ -77,16 +80,60 @@ def kNN(X_train, y_train, X_test, y_test, k, regression=False):
     
     
     
+def class_cond_prob(X, y):
+
+    """
+    Computes the probability density curves of the different 
+    features of the input data conditional on the binary 
+    class of output / target data y.
+    Assumes Gaussian distribution
+    """
     
     
-    
-    
-    
-    
-    
-    
-    
-    
+    for i in range(X.shape[1]):
+
+        # For each feature (i) we check what the values of that feature is for all samples that are classified as y = 1
+        X_class1 = X[:, i][y==1]
+        X_class0 = X[:, i][y==0]
+
+        # We calculate the mean and std for the Gaussian distribution we can assume
+        mu_0 = np.mean(X_class0)
+        sigma_0 = np.std(X_class0)
+        
+        mu_1 = np.mean(X_class1)
+        sigma_1 = np.std(X_class1)
+
+
+        # We plot this distribution for each feature
+        fig, ax = plt.subplots(1, 1)
+        rv_0 = norm(mu_0, sigma_0)
+        rv_1 = norm(mu_1, sigma_1)
+
+        # Define x values based on mu and sigma
+
+        x_0 = np.linspace(norm.ppf(0.01, loc=mu_0, scale=sigma_0),norm.ppf(0.99, loc=mu_0, scale=sigma_0), 100) 
+        x_1 = np.linspace(norm.ppf(0.01, loc=mu_1, scale=sigma_1),norm.ppf(0.99, loc=mu_1, scale=sigma_1), 100) 
+        
+        # Plot the probability density functions conditional on y = 0 and y = 1
+        ax.plot(x_0, rv_0.pdf(x_0), 'r-', lw=2, label='frozen pdf0')
+        ax.plot(x_1, rv_1.pdf(x_1), 'b-', lw=2, label='frozen pdf1')
+        legend = ['Conditional y = 0', 'Conditional y = 1']
+        plt.legend(legend)
+        plt.xlabel('feature_' + str(i) + ' values')
+        plt.ylabel('Probability density')
+        plt.title('Conditional probability density plots of feature_' + str(i), fontsize=10)
+
+
+
+
+
+
+
+
+
+
+
+
     
     
     
