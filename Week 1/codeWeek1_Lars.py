@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 def pred(x, w):
     """
-    Predicts the output y based on the input x and fitted weights w 
+    Predicts the output y based on the input x and fitted weights w
     :param X: Input data matrix
     :param w: fitted weights
     :return: Predictions
@@ -11,7 +11,7 @@ def pred(x, w):
     x = np.insert(x, 0, 1, axis=1)
     # Calculate the predictions using weights
     y_pred = x.dot(w)
-    
+
     return y_pred
 
 def calcMSE(y, y_pred):
@@ -23,8 +23,8 @@ def calcMSE(y, y_pred):
     """
     # Calculate the mean-squared error
     MSE = np.sum((y-y_pred)**2)/len(y)
-    
-    return MSE 
+
+    return MSE
 
 def kNNclassifier(X_train, X_test, y_train, k):
     """
@@ -48,7 +48,7 @@ def kNNclassifier(X_train, X_test, y_train, k):
         distances_sorted = sorted(distances, key=lambda x: x[0])
         # Calculate the median predicted class based on first k neighbours
         classes.append(round(np.median(list(distances_sorted[i][1] for i in range(k)))))
-        
+
     return classes
 
 def kNNRegression(X_train, X_test, y_train, k):
@@ -73,12 +73,12 @@ def kNNRegression(X_train, X_test, y_train, k):
         distances_sorted = np.array(sorted(distances, key=lambda x: x[0]))
         # Calculate the mean predicted value based on first k neighbours
         y_pred.append(np.mean(distances_sorted[:k, 1]))
-        
+
     return y_pred
 
 
 def class_conditional_prob(X,Y):
-    
+
     # Calculate probability of y=1
     Py = np.sum(Y[:,0])/Y.shape[0]
 
@@ -93,8 +93,8 @@ def class_conditional_prob(X,Y):
         var = np.std(XY)**2
 
         P = []
-        
-        # Calculate P(x=X|y=Y) 
+
+        # Calculate P(x=X|y=Y)
         for x in np.linspace(0,1,100):
             Pxy = np.sqrt(1/(2*np.pi*var))*np.exp(-1/(2*var)*(x-mu)**2)
             Pcond = Pxy / Py

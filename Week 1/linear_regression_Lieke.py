@@ -16,4 +16,3 @@ def lsq(X, y):
     beta = np.dot(np.linalg.inv(np.dot(X.T, X)), np.dot(X.T, y))
 
     return beta
-
