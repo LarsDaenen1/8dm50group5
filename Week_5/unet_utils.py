@@ -106,7 +106,6 @@ def extract_patches(images, segmentations, patch_size, patches_per_im, seed):
     return x, y
 
 
-
 # Create a very simple datagenerator
 def datagenerator(images, segmentations, patch_size, patches_per_im, batch_size):
     """
@@ -120,8 +119,7 @@ def datagenerator(images, segmentations, patch_size, patches_per_im, batch_size)
     :param batch_size: Number of patches per batch
     :return: Batch of patches to feed to the model
     """
-    
- 
+
     # Total number of patches generated per epoch
     total_patches = len(images) * patches_per_im
     # Amount of batches in one epoch
@@ -129,7 +127,7 @@ def datagenerator(images, segmentations, patch_size, patches_per_im, batch_size)
 
     while True:
         # Each epoch extract different patches from the training images
-        
+
         x, y = extract_patches(images, segmentations, patch_size, patches_per_im, seed=np.random.randint(0, 500))
 
         # Feed data in batches to the network
@@ -137,10 +135,3 @@ def datagenerator(images, segmentations, patch_size, patches_per_im, batch_size)
             x_batch = x[idx * batch_size:(idx + 1) * batch_size]
             y_batch = y[idx * batch_size:(idx + 1) * batch_size]
             yield x_batch, y_batch
-
-
-
-
-
-
-

@@ -6,6 +6,7 @@ from tensorflow.keras.layers import Concatenate, BatchNormalization
 from tensorflow.keras import backend as K
 
 
+
 def conv_block(inp, encoder_list, channels, batchnorm, regularization, encoder_branch=False, pool=False):
     """
     Convolutional block, consists of optional max-pooling followed by two convolutional layers
